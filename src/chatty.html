@@ -30,6 +30,7 @@
                 Bodies = Matter.Bodies;
                 Composites = Matter.Composites,
                 Common = Matter.Common;
+                
 
 
 
@@ -57,7 +58,7 @@
             Runner.run(runner, engine);
 
             
-            let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { isStatic: true,friction: 10.00001, restitution: 0.5, density: 0.001 ,render: { fillStyle: '#E91E63' } })
+            let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { id:"player", isStatic: true,friction: 10.00001, restitution: 0.5, density: 0.001 ,render: { fillStyle: '#E91E63' } })
             // add bodies
             let joyStick = document.getElementById("joyStick");
             let defaultX = joyStick.dataset.x;
@@ -68,9 +69,29 @@
                 defaultY = parseInt(joyStick.dataset.y);
                 userInputing = true;
             }
+            let gameWon = false;
+//             Events.on(engine, 'collisionStart', function(event) {
+// 	// We know there was a collision so fetch involved elements ...
+//     if(event.pairs.length>0 && !gameWon){
+
+//         event.pairs.forEach((currentPair)=>{
+//         gameWon = ((currentPair.bodyA.id =="player" ||currentPair.bodyA.id =="goalObject") &&
+//              (currentPair.bodyB.id =="player" ||currentPair.bodyB.id =="goalObject"))
+//         })
+//         if(gameWon){
+//             alert("you win");
+//         }
+//     }
+// 	// Now do something with the event and elements ... your task ;-)
+// });
+let alreadyWon = false;
             Events.on(engine, "beforeUpdate", function () {
                 if (userInputing) {
-
+                    let result = Matter.SAT.collides(goalArea, goalObject) // returns either true or false depending on if the two objects are colliding 
+                    if(result !=null && !alreadyWon){
+                        alreadyWon = true;
+                        alert("you won")
+                    }
                     let position = player.position;
                     let defferenceX = defaultX - parseInt(joyStick.dataset.x);
                     let defferenceY = defaultY - parseInt(joyStick.dataset.y);
@@ -117,10 +138,11 @@
             })
 
 
+           let goalArea = Bodies.rectangle(300, 200, 400, 50, {id:"goalArea", isStatic: true, render:{"fillStyle":"#673AB7"} });
             Composite.add(world, [
                 // walls
+                goalArea,
                 Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
-                Bodies.rectangle(300, 200, 400, 50, { isStatic: true, render:{"fillStyle":"#673AB7"} }),
                 Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
                 Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
                 Bodies.rectangle(0, 300, 50, 600, { isStatic: true })
@@ -130,12 +152,13 @@
                 player
             ]);
 
+            let goalObject =Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, {id:"goalObject", friction: 10.001,render:{"fillStyle":"#FF0000"} })
             Composite.add(world, [
-                Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { friction: 10.001 })
+                goalObject
             ]);
 
             Composite.add(world, [
-                Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { friction: 10.001 })
+                Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id:"goals", friction: 10.001 })
             ]);
             let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
                 return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
