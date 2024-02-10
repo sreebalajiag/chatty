@@ -65,7 +65,6 @@
             }
             var output = function (event) {
                 let position = player.position;
-                console.log(position);
                 let defferenceX = defaultX - parseInt(event.target.dataset.x);
                 let defferenceY = defaultY - parseInt(event.target.dataset.y);
 
@@ -73,7 +72,7 @@
                 let newPositionY = (defaultY - parseInt(event.target.dataset.y));
                 if(newPositionX<0){
                     newPositionX = 1;
-                }else if(newPositionY>0){
+                }else if(newPositionX>0){
                     newPositionX = -1;
                 }
                 if(newPositionY<0){
@@ -87,7 +86,7 @@
                 newPositionX = position.x +newPositionX;
                 newPositionY = position.y +newPositionY;
 
-                newPositionX = Math.min(newPositionX, window.innerWidth );
+                newPositionX = Math.min(newPositionX, window.innerWidth*2 );
                 newPositionX = Math.max(0, newPositionX);
                 newPositionY = Math.min(newPositionY, window.innerHeight );
                 newPositionY = Math.max(0, newPositionY);
