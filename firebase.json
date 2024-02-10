@@ -1,6 +1,11 @@
 {
   "hosting": {
     "public": "src",
+    "redirects": [ {
+      "source": "/",
+      "destination": "/chatty.html",
+      "type": 301
+    } ],
     "ignore": [
       "firebase.json",
       "**/.*",
