@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    Hit purple area with red box by using joyStick 
     <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
   right: 50px;">
         <div id="world"></div>
@@ -28,9 +29,9 @@
                 Mouse = Matter.Mouse,
                 Composite = Matter.Composite,
                 Bodies = Matter.Bodies;
-                Composites = Matter.Composites,
+            Composites = Matter.Composites,
                 Common = Matter.Common;
-                
+
 
 
 
@@ -57,8 +58,8 @@
             var runner = Runner.create();
             Runner.run(runner, engine);
 
-            
-            let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { id:"player", isStatic: true,friction: 10.00001, restitution: 0.5, density: 0.001 ,render: { fillStyle: '#E91E63' } })
+
+            let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
             // add bodies
             let joyStick = document.getElementById("joyStick");
             let defaultX = joyStick.dataset.x;
@@ -70,25 +71,11 @@
                 userInputing = true;
             }
             let gameWon = false;
-//             Events.on(engine, 'collisionStart', function(event) {
-// 	// We know there was a collision so fetch involved elements ...
-//     if(event.pairs.length>0 && !gameWon){
-
-//         event.pairs.forEach((currentPair)=>{
-//         gameWon = ((currentPair.bodyA.id =="player" ||currentPair.bodyA.id =="goalObject") &&
-//              (currentPair.bodyB.id =="player" ||currentPair.bodyB.id =="goalObject"))
-//         })
-//         if(gameWon){
-//             alert("you win");
-//         }
-//     }
-// 	// Now do something with the event and elements ... your task ;-)
-// });
-let alreadyWon = false;
+            let alreadyWon = false;
             Events.on(engine, "beforeUpdate", function () {
                 if (userInputing) {
-                    let result = Matter.SAT.collides(goalArea, goalObject) // returns either true or false depending on if the two objects are colliding 
-                    if(result !=null && !alreadyWon){
+                    let result = Matter.Collision.collides(goalArea, goalObject) // returns either true or false depending on if the two objects are colliding 
+                    if (result != null && !alreadyWon) {
                         alreadyWon = true;
                         alert("you won")
                     }
@@ -138,7 +125,7 @@ let alreadyWon = false;
             })
 
 
-           let goalArea = Bodies.rectangle(300, 200, 400, 50, {id:"goalArea", isStatic: true, render:{"fillStyle":"#673AB7"} });
+            let goalArea = Bodies.rectangle(300, 200, 400, 50, { id: "goalArea", isStatic: true, render: { "fillStyle": "#673AB7" } });
             Composite.add(world, [
                 // walls
                 goalArea,
@@ -152,13 +139,13 @@ let alreadyWon = false;
                 player
             ]);
 
-            let goalObject =Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, {id:"goalObject", friction: 10.001,render:{"fillStyle":"#FF0000"} })
+            let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
             Composite.add(world, [
                 goalObject
             ]);
 
             Composite.add(world, [
-                Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id:"goals", friction: 10.001 })
+                Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
             ]);
             let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
                 return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
