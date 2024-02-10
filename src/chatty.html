@@ -87,9 +87,9 @@
                 newPositionX = position.x +newPositionX;
                 newPositionY = position.y +newPositionY;
 
-                // newPositionX = Math.min(newPositionX, window.innerWidth );
+                newPositionX = Math.min(newPositionX, window.innerWidth );
                 newPositionX = Math.max(0, newPositionX);
-                // newPositionY = Math.min(newPositionY, window.innerHeight );
+                newPositionY = Math.min(newPositionY, window.innerHeight );
                 newPositionY = Math.max(0, newPositionY);
 
                 Matter.Body.set(player, "position", {
