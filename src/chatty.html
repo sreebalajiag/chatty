@@ -16,7 +16,7 @@
     <script>
         var Example = Example || {};
         let playerHeight = 40;
-        let playerWidth = 40;
+        let playerWidth = 80;
 
         Example.friction = function () {
 
@@ -28,7 +28,7 @@
                 Mouse = Matter.Mouse,
                 Composite = Matter.Composite,
                 Bodies = Matter.Bodies;
-            Composites = Matter.Composites,
+                Composites = Matter.Composites,
                 Common = Matter.Common;
 
 
@@ -56,7 +56,7 @@
             var runner = Runner.create();
             Runner.run(runner, engine);
 
-            let topWall = Bodies.rectangle(400, 0, 800, 50, { isStatic: true });
+            
             let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { isStatic: true })
             // add bodies
             let joyStick = document.getElementById("joyStick");
@@ -119,7 +119,8 @@
 
             Composite.add(world, [
                 // walls
-                topWall,
+                Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
+                Bodies.rectangle(300, 200, 400, 50, { isStatic: true }),
                 Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
                 Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
                 Bodies.rectangle(0, 300, 50, 600, { isStatic: true })
