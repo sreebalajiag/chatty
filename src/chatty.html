@@ -81,14 +81,15 @@
                 }else if(newPositionY>0){
                     newPositionY= -1;
                 }
-                newPositionX = event.target.dataset.force*newPositionX;
-                newPositionY = event.target.dataset.force*newPositionY;
+
+                newPositionX = event.target.dataset.force*newPositionX*3;
+                newPositionY = event.target.dataset.force*newPositionY*3;
                 newPositionX = position.x +newPositionX;
                 newPositionY = position.y +newPositionY;
 
-                newPositionX = Math.min(newPositionX, window.innerWidth );
+                // newPositionX = Math.min(newPositionX, window.innerWidth );
                 newPositionX = Math.max(0, newPositionX);
-                newPositionY = Math.min(newPositionY, window.innerHeight );
+                // newPositionY = Math.min(newPositionY, window.innerHeight );
                 newPositionY = Math.max(0, newPositionY);
 
                 Matter.Body.set(player, "position", {
