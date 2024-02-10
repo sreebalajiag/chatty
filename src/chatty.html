@@ -8,8 +8,8 @@
 </head>
 
 <body>
-    <div style="display: flex; gap: 10px; position:fixed;bottom: 10px;
-  right: 10px;">
+    <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
+  right: 50px;">
         <div id="world"></div>
         <virtual-joystick id="joyStick" data-x="0" data-y="0"></virtual-joystick>
     </div>
@@ -31,6 +31,7 @@
                 Composites = Matter.Composites,
                 Common = Matter.Common;
                 
+                
 
             // create engine
             var engine = Engine.create(),
@@ -48,7 +49,7 @@
                     showVelocity: true
                 }
             });
-
+            Matter.Render.setPixelRatio(render, 'auto');
             Render.run(render);
 
             // create runner
