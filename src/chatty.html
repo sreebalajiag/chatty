@@ -8,12 +8,13 @@
 </head>
 
 <body>
-    Hit purple area with red box by using joyStick 
+    <div class="score-card">0</div>
     <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
   right: 50px;">
         <div id="world"></div>
         <virtual-joystick id="joyStick" data-x="0" data-y="0"></virtual-joystick>
     </div>
+    <script src="virtual-joystick.js"></script>
     <script>
         var Example = Example || {};
         let playerHeight = 40;
@@ -37,7 +38,9 @@
 
             // create engine
             var engine = Engine.create(),
+
                 world = engine.world;
+            engine.gravity.y = 0.4;
 
             // create renderer
             var render = Render.create({
@@ -59,7 +62,7 @@
             Runner.run(runner, engine);
 
 
-            let player = Bodies.rectangle(0, 0, playerWidth, playerHeight, { id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
+            let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, { id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
             // add bodies
             let joyStick = document.getElementById("joyStick");
             let defaultX = joyStick.dataset.x;
@@ -71,14 +74,71 @@
                 userInputing = true;
             }
             let gameWon = false;
-            let alreadyWon = false;
-            Events.on(engine, "beforeUpdate", function () {
-                if (userInputing) {
-                    let result = Matter.Collision.collides(goalArea, goalObject) // returns either true or false depending on if the two objects are colliding 
-                    if (result != null && !alreadyWon) {
-                        alreadyWon = true;
-                        alert("you won")
+            let alreadyOut = false;
+
+
+            let shapesList = [];
+            for (i = 0; i < 10; i++) {
+                var sides = Math.round(Common.random(1, 8));
+
+                // round the edges of some bodies
+                var chamfer = null;
+                if (sides > 2) {
+                    chamfer = {
+                        radius: 10
+                    };
+                }
+                let x = Math.round(Common.random(0, window.innerWidth + 100));
+                let y = window.innerHeight + 1000;
+                let currentBody;
+                switch (Math.round(Common.random(0, 1))) {
+                    case 0:
+                        if (Common.random() < 0.8) {
+                            currentBody = Bodies.rectangle(x, y, Common.random(25, 50), Common.random(25, 50), { chamfer: chamfer });
+                        } else {
+                            currentBody = Bodies.rectangle(x, y, Common.random(80, 120), Common.random(25, 30), { chamfer: chamfer });
+                        }
+                    case 1:
+                        currentBody = Bodies.polygon(x, y, sides, Common.random(25, 50), { chamfer: chamfer });
+                }
+                shapesList.push(currentBody);
+                Composite.add(world, [currentBody]);
+            }
+            let score = 0;
+            let scoreCard = document.getElementsByClassName('score-card')[0];
+            setInterval(
+                function () {
+                    score += 10;
+                    scoreCard.innerHTML = score;
+                }, 100)
+            setInterval(
+                function () {
+
+                    let position = player.position.x;
+                    if (Common.random() > 0.75) {
+                        position = Common.random(0, window.innerWidth + 100)
                     }
+                    randomShape = shapesList[Math.round(Common.random(0, 9))];
+                    Matter.Body.set(randomShape, "position", {
+                        x: position,
+                        y: -100
+                    });
+
+
+                }, 800
+            )
+
+            Events.on(engine, "beforeUpdate", function () {
+
+                shapesList.forEach((currentShape) => {
+
+                    let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
+                    if (result != null && !alreadyOut) {
+                        alreadyOut = true;
+                        window.location.href = "/index.html";
+                    }
+                })
+                if (userInputing) {
                     let position = player.position;
                     let defferenceX = defaultX - parseInt(joyStick.dataset.x);
                     let defferenceY = defaultY - parseInt(joyStick.dataset.y);
@@ -125,35 +185,41 @@
             })
 
 
-            let goalArea = Bodies.rectangle(300, 200, 400, 50, { id: "goalArea", isStatic: true, render: { "fillStyle": "#673AB7" } });
-            Composite.add(world, [
-                // walls
-                goalArea,
-                Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
-                Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-                Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
-                Bodies.rectangle(0, 300, 50, 600, { isStatic: true })
-            ]);
+
 
             Composite.add(world, [
                 player
             ]);
 
-            let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
-            Composite.add(world, [
-                goalObject
-            ]);
+            // let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
+            // Composite.add(world, [
+            //     goalObject
+            // ]);
 
-            Composite.add(world, [
-                Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
-            ]);
-            let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
-                return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
-            });
+            // setTimeout(function(){
 
-            Composite.add(world, stack);
+            //     Matter.Body.set(goalObject, "position", {
+            //                 x: window.innerWidth / 2,
+            //                 y: 250
+            //             });
+            // },1000)
+
+            // Composite.add(world, [
+            //     Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
+            // ]);
+
+
+
+            // let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
+            //     return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
+            // });
+
+            // Composite.add(world, stack);
 
             // add mouse control
+
+
+
             var mouse = Mouse.create(render.canvas),
                 mouseConstraint = MouseConstraint.create(engine, {
                     mouse: mouse,
@@ -198,7 +264,5 @@
         Example.friction();
 
     </script>
-    <script src="virtual-joystick.js"></script>
-</body>
 
-</html>
+</body>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<script>
+  handlePlayClick= function(){
+    window.location.href = "/chatty.html";
+  }
+</script>
+<body>
+  <div>
+
+    <div class="image-parent">
+      <svg width="294" height="97" viewBox="0 0 294 97" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="35" cy="44" r="35" fill="#E91E63"/>
+        <circle cx="46" cy="44" r="25" fill="white"/>
+        <rect x="80" y="14" width="7" height="55" rx="3.5" fill="#673AB7"/>
+        <rect x="106" y="14" width="7" height="55" rx="3.5" fill="#673AB7"/>
+        <rect x="188" y="14" width="7" height="55" rx="3.5" fill="#D81F1F"/>
+        <rect x="221" y="14" width="7" height="55" rx="3.5" fill="#FF5722"/>
+        <rect width="8.8241" height="44.7132" rx="4.41205" transform="matrix(0.579902 -0.814686 0.759106 0.650966 245.885 17.2497)" fill="#FF9800"/>
+        <rect width="8.07587" height="63.7289" rx="4.03794" transform="matrix(0.914145 0.405388 -0.345438 0.938441 286.557 9)" fill="#FF9800"/>
+        <path d="M143.224 12.7038C145.793 7.50436 153.207 7.50434 155.776 12.7038L180.45 62.6495C182.749 67.3018 179.363 72.75 174.174 72.75H124.826C119.637 72.75 116.251 67.3018 118.55 62.6496L143.224 12.7038Z" fill="#9C27B0"/>
+        <path d="M148.105 41.7948C148.473 41.0564 149.527 41.0564 149.895 41.7948L164.733 71.5538C165.065 72.2186 164.581 73 163.838 73H134.162C133.419 73 132.935 72.2186 133.267 71.5538L148.105 41.7948Z" fill="white"/>
+        <rect x="72" y="36" width="36" height="10" fill="#673AB7"/>
+        <rect x="133" y="52" width="36" height="10" fill="#9C27B0"/>
+        <rect x="172" y="13" width="36" height="10" rx="5" fill="#D22323"/>
+        <rect x="209" y="13" width="36" height="10" rx="5" fill="#FF5722"/>
+        <circle cx="156.5" cy="33.5" r="2.5" fill="#D9D9D9"/>
+        <circle cx="141.5" cy="33.5" r="2.5" fill="#D9D9D9"/>
+        <circle cx="199.5" cy="18.5" r="2.5" fill="#4CAF50"/>
+        <circle cx="184.5" cy="18.5" r="2.5" fill="#4CAF50"/>
+        <circle cx="234.5" cy="18.5" r="2.5" fill="#673AB7"/>
+        <circle cx="219.5" cy="18.5" r="2.5" fill="#673AB7"/>
+        <circle cx="283.5" cy="32.5" r="2.5" fill="#1E1E1E"/>
+        <circle cx="269.5" cy="32.5" r="2.5" fill="#1E1E1E"/>
+        <circle cx="104.5" cy="40.5" r="2.5" fill="#E91E63"/>
+        <circle cx="89.5" cy="40.5" r="2.5" fill="#E91E63"/>
+        <circle cx="24.5" cy="22.5" r="2.5" fill="#00BCD4"/>
+        <circle cx="13.5" cy="22.5" r="2.5" fill="#00BCD4"/>
+        <path d="M157.735 59.2767C157.415 60.7948 153.37 61.2287 148.699 60.2457C144.027 59.2627 140.95 57.9856 141.27 56.4675C141.589 54.9494 144.246 58.2243 148.917 59.2073C153.588 60.1902 158.054 57.7586 157.735 59.2767Z" fill="white"/>
+        <path d="M23.1332 33.0999C22.5073 36.3584 18.2093 38.272 13.5332 37.3738C8.85709 36.4757 5.57372 33.1061 6.19957 29.8475C6.82541 26.589 8.85709 28.1019 13.5332 29C18 30.5 23.759 29.8413 23.1332 33.0999Z" fill="white"/>
+        </svg>
+          
+    </div>
+    <div class="button-parent">
+      <svg onclick="handlePlayClick()" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="30" fill="#D9D9D9"/>
+        <path d="M45.0244 27.9692C46.8764 29.1482 46.8764 31.8518 45.0244 33.0308L24.361 46.1843C22.3638 47.4557 19.75 46.0211 19.75 43.6536L19.75 17.3464C19.75 14.9789 22.3638 13.5443 24.361 14.8157L45.0244 27.9692Z" fill="#4CAF50"/>
+        </svg>
+        
+
+    </div>
+  </div>
+
+
+</body>
+
+<style>
+  .button-parent{
+    position: absolute;
+    z-index: 2;
+    width: 100vw;
+    top: 59vh;
+    display: flex;
+    justify-content: center;
+  }
+  .image-parent{
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+    position: absolute;
+    width: 100vw;
+  }
+</style>
+</html>
