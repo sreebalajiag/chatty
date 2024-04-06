@@ -155,7 +155,7 @@
             )
 
             Events.on(engine, "beforeUpdate",  ()=> {
-
+                Matter.Body.setAngle(player, player.angle + player.rotationSpeed);
                 shapesList.forEach((currentShape) => {
 
                     let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
