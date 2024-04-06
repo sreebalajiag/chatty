@@ -79,7 +79,10 @@
             Runner.run(runner, engine);
 
 
-            let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, { id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
+            let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, {
+                inertia: Infinity,// setting inertia to infinty will prevent rotation upon collision
+    rotationSpeed: 1,
+                id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
             // add bodies
             let joyStick = document.getElementById("joyStick");
             let defaultX = joyStick.dataset.x;
