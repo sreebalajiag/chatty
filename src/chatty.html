@@ -16,10 +16,17 @@
     </div>
     <script src="virtual-joystick.js"></script>
     <script>
+        
+        // 
+        
+
         var Example = Example || {};
         let playerHeight = 40;
         let playerWidth = 80;
-
+        Example.playAudio = function(audioText){
+            var audio = new Audio(`./assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
+  audio.play();
+        }
         Example.friction = function () {
 
             var Engine = Matter.Engine,
@@ -112,11 +119,17 @@
                     scoreCard.innerHTML = score;
                 }, 100)
             setInterval(
-                function () {
+                 ()=> {
 
                     let position = player.position.x;
                     if (Common.random() > 0.75) {
                         position = Common.random(0, window.innerWidth + 100)
+                    }else{
+                        if(position.x<(window.innerWidth/2)){
+                            this.playAudio('right');
+                        }else{
+                            this.playAudio('left');
+                        }
                     }
                     randomShape = shapesList[Math.round(Common.random(0, 9))];
                     Matter.Body.set(randomShape, "position", {
@@ -128,13 +141,14 @@
                 }, 800
             )
 
-            Events.on(engine, "beforeUpdate", function () {
+            Events.on(engine, "beforeUpdate",  ()=> {
 
                 shapesList.forEach((currentShape) => {
 
                     let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
                     if (result != null && !alreadyOut) {
                         alreadyOut = true;
+                        this.playAudio('out');
                         window.location.href = "/index.html";
                     }
                 })
