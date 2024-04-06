@@ -24,8 +24,18 @@
         let playerHeight = 40;
         let playerWidth = 80;
         Example.playAudio = function(audioText){
-            var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
-  audio.play();
+            if(!this.audioPlaying){
+                this.audioText = audioText;
+                var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
+                audio.play();
+                this.audioPlaying = true;
+                audio.addEventListener('ended',()=>{
+                    this.audioPlaying = false;
+                    if(this.audioText ==='out'){
+                        window.location.href = "/index.html";
+                    }
+                })
+            }
         }
         Example.friction = function () {
 
@@ -149,7 +159,7 @@
                     if (result != null && !alreadyOut) {
                         alreadyOut = true;
                         this.playAudio('out');
-                        window.location.href = "/index.html";
+                        
                     }
                 })
                 if (userInputing) {
