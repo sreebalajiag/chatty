@@ -257,21 +257,21 @@
     
     
     
-                var mouse = Mouse.create(render.canvas),
-                    mouseConstraint = MouseConstraint.create(engine, {
-                        mouse: mouse,
-                        constraint: {
-                            stiffness: 0.2,
-                            render: {
-                                visible: false
-                            }
-                        }
-                    });
+                // var mouse = Mouse.create(render.canvas),
+                //     mouseConstraint = MouseConstraint.create(engine, {
+                //         mouse: mouse,
+                //         constraint: {
+                //             stiffness: 0.2,
+                //             render: {
+                //                 visible: false
+                //             }
+                //         }
+                //     });
     
-                Composite.add(world, mouseConstraint);
+                // Composite.add(world, mouseConstraint);
     
-                // keep the mouse in sync with rendering
-                render.mouse = mouse;
+                // // keep the mouse in sync with rendering
+                // render.mouse = mouse;
     
                 // fit the render viewport to the scene
                 Render.lookAt(render, {
@@ -305,104 +305,71 @@
 
     </script>
     <script>
-        function showBackground(){
+       
+       const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
 
-            const canvas = document.getElementById('myCanvas');
-            const ctx = canvas.getContext('2d');
-    
-            // Get device width and scale canvas for high resolution
-            const deviceWidth = window.innerWidth;
-            const deviceHeight = window.innerHeight;
-            canvas.width = deviceWidth;
-            canvas.height = deviceHeight;
-            canvas.style.width = deviceHeight;
-            canvas.style.height = deviceHeight;
-            function getRandomColor() {
-                // Generate random bright colors (hue between 0 and 60, high saturation and brightness)
-                const hue = Math.floor(Math.random() * 60);
-                return `hsla(${hue}, 100%, 80%, 0.5)`;
-            }
-    
-            function getRandomShape() {
-                const shapes = ['rect', 'circle', 'triangle'];
-                return shapes[Math.floor(Math.random() * shapes.length)];
-            }
-    
-            let shapes = []; // Array to store shapes as JSON objects
-    
-            function createShape() {
-                if(shapes.length<100){
-                    const x = Math.random() * (deviceWidth - 50); // Avoid shapes going off-screen
-                    const y = 0; // Start at the top
-                    const size = Math.random() * 50 + 20;
-                    const velocity = Math.random() * 20 + 1; // Random velocity between 1 and 3
-                    const color = getRandomColor();
-                    const type = getRandomShape();
-        
-                    shapes.push({ x, y, size, velocity, color, type });
+        // Canvas dimensions (adjusted for potential device orientation changes)
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Light blue color for the waves
+        const lightBlue = '#ffeb3bbd';
+
+        // Wave properties
+        const amplitude = 50; // Adjust for wave height
+        const frequencyA = 2; // Adjust for wave frequency (left wave)
+        const frequencyB = 3; // Adjust for wave frequency (right wave)
+        let phaseShift = 0; // Animated phase shift
+
+        function drawWaves() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw left wave
+            ctx.beginPath();
+            ctx.lineWidth= 20;
+            ctx.strokeStyle = lightBlue; // Use strokeStyle for vertical lines
+            for (let y = 0; y < height; y++) {
+                let x = amplitude * Math.sin(frequencyA * y * Math.PI / height + phaseShift);
+                x = x-100;
+                if (y === 0) {
+                    ctx.moveTo(width / 2 + x, y);
+                } else {
+                    ctx.lineTo(width / 2 + x, y);
                 }
             }
-    
-            function updateShapes() {
-                // Clear canvas for new shapes
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-                shapes.forEach((shape, index) => {
-                    shape.y += shape.velocity; // Update y position based on gravity
-    
-                    // Check if shape goes off-screen (bottom)
-                    if (shape.y > deviceHeight + shape.size) {
-                        // Reposition at the top with a new random size and velocity
-                        shape.y = 0;
-                        shape.size = Math.random() * 50 + 20;
-                        shape.velocity = Math.random() * 20 + 1;
-                    }
-                });
-            }
-    
-            function drawShapes() {
-                updateShapes();
-    
-                // Draw all shapes
-                shapes.forEach(shape => {
-                    ctx.fillStyle = shape.color;
-                    switch (shape.type) {
-                        case 'rect':
-                            ctx.fillRect(shape.x, shape.y, shape.size, shape.size);
-                            break;
-                        case 'circle':
-                            ctx.beginPath();
-                            ctx.arc(shape.x + shape.size / 2, shape.y + shape.size / 2, shape.size / 2, 0, 2 * Math.PI);
-                            ctx.fill();
-                            break;
-                        case 'triangle':
-                            const halfSize = shape.size / 2;
-                            ctx.beginPath();
-                            ctx.moveTo(shape.x, shape.y + shape.size);
-                            ctx.lineTo(shape.x + shape.size, shape.y + shape.size);
-                            ctx.lineTo(shape.x + halfSize, shape.y);
-                            ctx.closePath();
-                            ctx.fill();
-                            break;
-                    }
-                });
-    
-                // Create a new shape every now and then
-                if (Math.random() < 0.1) { // Adjust probability of creating new shapes
-                    createShape();
+            ctx.stroke();
+
+            // Draw right wave (offset by half the canvas width)
+            ctx.beginPath();
+            ctx.strokeStyle = lightBlue;
+            for (let y = 0; y < height; y++) {
+                let x = amplitude * Math.sin(frequencyB * (y - height / 2) * Math.PI / height + phaseShift);
+                x = x+100;
+                if (y === 0) {
+                    ctx.moveTo(width / 2 + x, y);
+                } else {
+                    ctx.lineTo(width / 2 + x, y);
                 }
             }
-    
-            // Call drawShapes initially and set interval for updates
-            drawShapes();
-            setInterval(drawShapes, 50); // Update every 100 milliseconds for smoother animation
+            ctx.stroke();
+
+            // Update phase shift for animation
+            phaseShift += 0.05; // Adjust for desired animation speed
+
+            // Schedule the next animation frame
+            requestAnimationFrame(drawWaves);
         }
-    </script>
+        drawWaves();
+    
+       </script>
 
 <style>
     canvas{
-    /* position: fixed; */
-    /* z-index: 1; */
+     position: fixed; 
+     z-index: 1; 
     }
     </style>
 </body>
