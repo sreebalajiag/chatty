@@ -11,6 +11,12 @@
     <div class="score-card">0</div>
     <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
   right: 50px;">
+        <canvas id="myCanvas" style="width: 100vw;
+        height: 100vh;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: -1 !important;"></canvas>
         <div id="world"></div>
         <virtual-joystick id="joyStick" data-x="0" data-y="0"></virtual-joystick>
     </div>
@@ -62,7 +68,7 @@
                     element: document.body,
                     engine: engine,
                     options: {
-                        background: "#fff",
+                        background: "transparent",
                         wireframes: false,
                         width: window.innerWidth,
                         height: window.innerHeight,
@@ -294,5 +300,101 @@
 
 
     </script>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
 
+        // Get device width and scale canvas for high resolution
+        const deviceWidth = window.innerWidth;
+        const deviceHeight = window.innerHeight;
+        canvas.width = deviceWidth;
+        canvas.height = deviceHeight;
+
+        function getRandomColor() {
+            // Generate random bright colors (hue between 0 and 60, high saturation and brightness)
+            const hue = Math.floor(Math.random() * 60);
+            return `hsla(${hue}, 100%, 80%, 0.5)`;
+        }
+
+        function getRandomShape() {
+            const shapes = ['rect', 'circle', 'triangle'];
+            return shapes[Math.floor(Math.random() * shapes.length)];
+        }
+
+        let shapes = []; // Array to store shapes as JSON objects
+
+        function createShape() {
+            if(shapes.length<100){
+                const x = Math.random() * (deviceWidth - 50); // Avoid shapes going off-screen
+                const y = 0; // Start at the top
+                const size = Math.random() * 50 + 20;
+                const velocity = Math.random() * 20 + 1; // Random velocity between 1 and 3
+                const color = getRandomColor();
+                const type = getRandomShape();
+    
+                shapes.push({ x, y, size, velocity, color, type });
+            }
+        }
+
+        function updateShapes() {
+            // Clear canvas for new shapes
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            shapes.forEach((shape, index) => {
+                shape.y += shape.velocity; // Update y position based on gravity
+
+                // Check if shape goes off-screen (bottom)
+                if (shape.y > deviceHeight + shape.size) {
+                    // Reposition at the top with a new random size and velocity
+                    shape.y = 0;
+                    shape.size = Math.random() * 50 + 20;
+                    shape.velocity = Math.random() * 20 + 1;
+                }
+            });
+        }
+
+        function drawShapes() {
+            updateShapes();
+
+            // Draw all shapes
+            shapes.forEach(shape => {
+                ctx.fillStyle = shape.color;
+                switch (shape.type) {
+                    case 'rect':
+                        ctx.fillRect(shape.x, shape.y, shape.size, shape.size);
+                        break;
+                    case 'circle':
+                        ctx.beginPath();
+                        ctx.arc(shape.x + shape.size / 2, shape.y + shape.size / 2, shape.size / 2, 0, 2 * Math.PI);
+                        ctx.fill();
+                        break;
+                    case 'triangle':
+                        const halfSize = shape.size / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(shape.x, shape.y + shape.size);
+                        ctx.lineTo(shape.x + shape.size, shape.y + shape.size);
+                        ctx.lineTo(shape.x + halfSize, shape.y);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                }
+            });
+
+            // Create a new shape every now and then
+            if (Math.random() < 0.1) { // Adjust probability of creating new shapes
+                createShape();
+            }
+        }
+
+        // Call drawShapes initially and set interval for updates
+        drawShapes();
+        setInterval(drawShapes, 50); // Update every 100 milliseconds for smoother animation
+    </script>
+
+<style>
+    canvas{
+    position: fixed;
+    z-index: 1;
+    }
+    </style>
 </body>
