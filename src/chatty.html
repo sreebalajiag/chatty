@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 
-<body>
+<body onload="playGame()">
     <div class="score-card">0</div>
     <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
   right: 50px;">
@@ -16,279 +16,282 @@
     </div>
     <script src="virtual-joystick.js"></script>
     <script>
-        
-        // 
-        
+        function playGame(){
 
-        var Example = Example || {};
-        let playerHeight = 40;
-        let playerWidth = 80;
-        Example.playAudio = function(audioText){
-            if(!this.audioPlaying || audioText=='out'){
-                this.audioText = audioText;
-                var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
-                audio.play();
-                this.audioPlaying = true;
-                audio.addEventListener('ended',()=>{
-                    this.audioPlaying = false;
-                    if(this.audioText ==='out'){
-                        window.location.href = "/index.html";
-                    }
-                })
-            }
-        }
-        Example.friction = function () {
-
-            var Engine = Matter.Engine,
-                Events = Matter.Events,
-                Render = Matter.Render,
-                Runner = Matter.Runner,
-                MouseConstraint = Matter.MouseConstraint,
-                Mouse = Matter.Mouse,
-                Composite = Matter.Composite,
-                Bodies = Matter.Bodies;
-            Composites = Matter.Composites,
-                Common = Matter.Common;
-
-
-
-
-            // create engine
-            var engine = Engine.create(),
-
-                world = engine.world;
-            engine.gravity.y = 0.2;
-
-            // create renderer
-            var render = Render.create({
-                element: document.body,
-                engine: engine,
-                options: {
-                    background: "#fff",
-                    wireframes: false,
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    showVelocity: true
-                }
-            });
-            Matter.Render.setPixelRatio(render, 'auto');
-            Render.run(render);
-
-            // create runner
-            var runner = Runner.create();
-            Runner.run(runner, engine);
-
-
-            let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, {
-                inertia: Infinity,// setting inertia to infinty will prevent rotation upon collision
-    rotationSpeed: 0.5,
-                id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
-            // add bodies
-            let joyStick = document.getElementById("joyStick");
-            let defaultX = joyStick.dataset.x;
-            let defaultY = joyStick.dataset.y;
-            let userInputing = false;
-            var handleJoyStickDown = function (event) {
-                defaultX = parseInt(joyStick.dataset.x);
-                defaultY = parseInt(joyStick.dataset.y);
-                userInputing = true;
-            }
-            let gameWon = false;
-            let alreadyOut = false;
-
-
-            let shapesList = [];
-            for (i = 0; i < 10; i++) {
-                var sides = Math.round(Common.random(1, 8));
-
-                // round the edges of some bodies
-                var chamfer = null;
-                if (sides > 2) {
-                    chamfer = {
-                        radius: 10
-                    };
-                }
-                let x = Math.round(Common.random(0, window.innerWidth + 100));
-                let y = window.innerHeight + 1000;
-                let currentBody;
-                switch (Math.round(Common.random(0, 1))) {
-                    case 0:
-                        if (Common.random() < 0.8) {
-                            currentBody = Bodies.rectangle(x, y, Common.random(50, 150), Common.random(50, 150), { chamfer: chamfer });
-                        } else {
-                            currentBody = Bodies.rectangle(x, y, Common.random(180, 220), Common.random(125, 130), { chamfer: chamfer });
+            var Example = Example || {};
+            let playerHeight = 40;
+            let playerWidth = 80;
+            Example.playAudio = function(audioText){
+                if(!this.audioPlaying || audioText=='out'){
+                    this.audioText = audioText;
+                    var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
+                    audio.play();
+                    this.audioPlaying = true;
+                    audio.addEventListener('ended',()=>{
+                        this.audioPlaying = false;
+                        if(this.audioText ==='out'){
+                            window.location.href = "/index.html";
                         }
-                    case 1:
-                        currentBody = Bodies.polygon(x, y, sides, Common.random(50, 150), { chamfer: chamfer });
+                    })
                 }
-                shapesList.push(currentBody);
-                Composite.add(world, [currentBody]);
             }
-            let score = 0;
-            let scoreCard = document.getElementsByClassName('score-card')[0];
-            setInterval(
-                function () {
-                    score += 10;
-                    scoreCard.innerHTML = score;
-                }, 100)
-            setInterval(
-                 ()=> {
-
-                    let position = player.position.x;
-                    if (Common.random() > 0.75) {
-                        position = Common.random(0, window.innerWidth + 100)
-                    }else{
-                        if(position<(window.innerWidth)){
-                            this.playAudio('right');
-                        }else{
-                            this.playAudio('left');
-                        }
-                    }
-                    randomShape = shapesList[Math.round(Common.random(0, 9))];
-                    Matter.Body.set(randomShape, "position", {
-                        x: position,
-                        y: -100
-                    });
-
-
-                }, 1000
-            )
-
-            Events.on(engine, "beforeUpdate",  ()=> {
-                Matter.Body.setAngle(player, player.angle + player.rotationSpeed);
-                shapesList.forEach((currentShape) => {
-
-                    let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
-                    if (result != null && !alreadyOut) {
-                        alreadyOut = true;
-                        this.playAudio('out');
-                        
-                    }
-                })
-                if (userInputing) {
-                    let position = player.position;
-                    let defferenceX = defaultX - parseInt(joyStick.dataset.x);
-                    let defferenceY = defaultY - parseInt(joyStick.dataset.y);
-
-                    let newPositionX = (defaultX - parseInt(joyStick.dataset.x));
-                    let newPositionY = (defaultY - parseInt(joyStick.dataset.y));
-                    if (newPositionX < 0) {
-                        newPositionX = 1;
-                    } else if (newPositionX > 0) {
-                        newPositionX = -1;
-                    }
-                    if (newPositionY < 0) {
-                        newPositionY = 1;
-                    } else if (newPositionY > 0) {
-                        newPositionY = -1;
-                    }
-
-                    newPositionX = joyStick.dataset.force * newPositionX * 3;
-                    newPositionY = joyStick.dataset.force * newPositionY * 3;
-                    newPositionX = position.x + newPositionX;
-                    newPositionY = position.y + newPositionY;
-
-                    newPositionX = Math.min(newPositionX, window.innerWidth * 2);
-                    newPositionX = Math.max(0, newPositionX);
-                    newPositionY = Math.min(newPositionY, window.innerHeight);
-                    newPositionY = Math.max(0, newPositionY);
-
-                    Matter.Body.set(player, "position", {
-                        x: newPositionX,
-                        y: newPositionY
-                    });
-                }
-            });
-            var output = function (event) {
-                // defaultX = parseInt(joyStick.dataset.x);
-                // defaultY = parseInt(joyStick.dataset.y);
-
-            }
-
-            document.getElementById("joyStick").addEventListener('joystickdown', handleJoyStickDown);
-            document.getElementById("joyStick").addEventListener('joystickmove', output);
-            document.getElementById("joyStick").addEventListener('joystickup', function () {
-                userInputing = false;
-            })
-
-
-
-
-            Composite.add(world, [
-                player
-            ]);
-
-            // let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
-            // Composite.add(world, [
-            //     goalObject
-            // ]);
-
-            // setTimeout(function(){
-
-            //     Matter.Body.set(goalObject, "position", {
-            //                 x: window.innerWidth / 2,
-            //                 y: 250
-            //             });
-            // },1000)
-
-            // Composite.add(world, [
-            //     Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
-            // ]);
-
-
-
-            // let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
-            //     return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
-            // });
-
-            // Composite.add(world, stack);
-
-            // add mouse control
-
-
-
-            var mouse = Mouse.create(render.canvas),
-                mouseConstraint = MouseConstraint.create(engine, {
-                    mouse: mouse,
-                    constraint: {
-                        stiffness: 0.2,
-                        render: {
-                            visible: false
-                        }
+            Example.friction = function () {
+    
+                var Engine = Matter.Engine,
+                    Events = Matter.Events,
+                    Render = Matter.Render,
+                    Runner = Matter.Runner,
+                    MouseConstraint = Matter.MouseConstraint,
+                    Mouse = Matter.Mouse,
+                    Composite = Matter.Composite,
+                    Bodies = Matter.Bodies;
+                Composites = Matter.Composites,
+                    Common = Matter.Common;
+    
+    
+    
+    
+                // create engine
+                var engine = Engine.create(),
+    
+                    world = engine.world;
+                engine.gravity.y = 0.2;
+    
+                // create renderer
+                var render = Render.create({
+                    element: document.body,
+                    engine: engine,
+                    options: {
+                        background: "#fff",
+                        wireframes: false,
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                        showVelocity: true
                     }
                 });
-
-            Composite.add(world, mouseConstraint);
-
-            // keep the mouse in sync with rendering
-            render.mouse = mouse;
-
-            // fit the render viewport to the scene
-            Render.lookAt(render, {
-                min: { x: 0, y: 0 },
-                max: { x: 800, y: 600 }
-            });
-
-            // context for MatterTools.Demo
-            return {
-                engine: engine,
-                runner: runner,
-                render: render,
-                canvas: render.canvas,
-                stop: function () {
-                    Matter.Render.stop(render);
-                    Matter.Runner.stop(runner);
+                Matter.Render.setPixelRatio(render, 'auto');
+                Render.run(render);
+    
+                // create runner
+                var runner = Runner.create();
+                Runner.run(runner, engine);
+    
+    
+                let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, {
+                    inertia: Infinity,// setting inertia to infinty will prevent rotation upon collision
+        rotationSpeed: 0.5,chamfer: {
+                            radius: 10
+                        },
+                    id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
+                // add bodies
+                let joyStick = document.getElementById("joyStick");
+                let defaultX = joyStick.dataset.x;
+                let defaultY = joyStick.dataset.y;
+                let userInputing = false;
+                var handleJoyStickDown = function (event) {
+                    defaultX = parseInt(joyStick.dataset.x);
+                    defaultY = parseInt(joyStick.dataset.y);
+                    userInputing = true;
                 }
+                let gameWon = false;
+                let alreadyOut = false;
+    
+    
+                let shapesList = [];
+                for (i = 0; i < 10; i++) {
+                    var sides = Math.round(Common.random(1, 8));
+    
+                    // round the edges of some bodies
+                    var chamfer = null;
+                    if (sides > 2) {
+                        chamfer = {
+                            radius: 10
+                        };
+                    }
+                    let x = Math.round(Common.random(0, window.innerWidth + 100));
+                    let y = window.innerHeight + 1000;
+                    let currentBody;
+                    switch (Math.round(Common.random(0, 1))) {
+                        case 0:
+                            if (Common.random() < 0.8) {
+                                currentBody = Bodies.rectangle(x, y, Common.random(50, 150), Common.random(50, 150), { chamfer: chamfer });
+                            } else {
+                                currentBody = Bodies.rectangle(x, y, Common.random(180, 220), Common.random(125, 130), { chamfer: chamfer });
+                            }
+                        case 1:
+                            currentBody = Bodies.polygon(x, y, sides, Common.random(50, 150), { chamfer: chamfer });
+                    }
+                    shapesList.push(currentBody);
+                    Composite.add(world, [currentBody]);
+                }
+                let score = 0;
+                let scoreCard = document.getElementsByClassName('score-card')[0];
+                setInterval(
+                    function () {
+                        score += 10;
+                        scoreCard.innerHTML = score;
+                    }, 100)
+                setInterval(
+                     ()=> {
+    
+                        let position = player.position.x;
+                        if (Common.random() > 0.75) {
+                            position = Common.random(0, window.innerWidth + 100)
+                        }else{
+                            if(position<(window.innerWidth)){
+                                this.playAudio('right');
+                            }else{
+                                this.playAudio('left');
+                            }
+                        }
+                        randomShape = shapesList[Math.round(Common.random(0, 9))];
+                        Matter.Body.set(randomShape, "position", {
+                            x: position,
+                            y: -100
+                        });
+    
+    
+                    }, 1500
+                )
+    
+                Events.on(engine, "beforeUpdate",  ()=> {
+                    Matter.Body.setAngle(player, player.angle + player.rotationSpeed);
+                    shapesList.forEach((currentShape) => {
+    
+                        let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
+                        if (result != null && !alreadyOut) {
+                            alreadyOut = true;
+                            this.playAudio('out');
+                            
+                        }
+                    })
+                    if (userInputing) {
+                        let position = player.position;
+                        let defferenceX = defaultX - parseInt(joyStick.dataset.x);
+                        let defferenceY = defaultY - parseInt(joyStick.dataset.y);
+    
+                        let newPositionX = (defaultX - parseInt(joyStick.dataset.x));
+                        let newPositionY = (defaultY - parseInt(joyStick.dataset.y));
+                        if (newPositionX < 0) {
+                            newPositionX = 1;
+                        } else if (newPositionX > 0) {
+                            newPositionX = -1;
+                        }
+                        if (newPositionY < 0) {
+                            newPositionY = 1;
+                        } else if (newPositionY > 0) {
+                            newPositionY = -1;
+                        }
+    
+                        newPositionX = joyStick.dataset.force * newPositionX * 3;
+                        newPositionY = joyStick.dataset.force * newPositionY * 3;
+                        newPositionX = position.x + newPositionX;
+                        newPositionY = position.y + newPositionY;
+    
+                        newPositionX = Math.min(newPositionX, window.innerWidth * 2);
+                        newPositionX = Math.max(0, newPositionX);
+                        newPositionY = Math.min(newPositionY, window.innerHeight);
+                        newPositionY = Math.max(0, newPositionY);
+    
+                        Matter.Body.set(player, "position", {
+                            x: newPositionX,
+                            y: newPositionY
+                        });
+                    }
+                });
+                var output = function (event) {
+                    // defaultX = parseInt(joyStick.dataset.x);
+                    // defaultY = parseInt(joyStick.dataset.y);
+    
+                }
+    
+                document.getElementById("joyStick").addEventListener('joystickdown', handleJoyStickDown);
+                document.getElementById("joyStick").addEventListener('joystickmove', output);
+                document.getElementById("joyStick").addEventListener('joystickup', function () {
+                    userInputing = false;
+                })
+    
+    
+    
+    
+                Composite.add(world, [
+                    player
+                ]);
+    
+                // let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
+                // Composite.add(world, [
+                //     goalObject
+                // ]);
+    
+                // setTimeout(function(){
+    
+                //     Matter.Body.set(goalObject, "position", {
+                //                 x: window.innerWidth / 2,
+                //                 y: 250
+                //             });
+                // },1000)
+    
+                // Composite.add(world, [
+                //     Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
+                // ]);
+    
+    
+    
+                // let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
+                //     return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
+                // });
+    
+                // Composite.add(world, stack);
+    
+                // add mouse control
+    
+    
+    
+                var mouse = Mouse.create(render.canvas),
+                    mouseConstraint = MouseConstraint.create(engine, {
+                        mouse: mouse,
+                        constraint: {
+                            stiffness: 0.2,
+                            render: {
+                                visible: false
+                            }
+                        }
+                    });
+    
+                Composite.add(world, mouseConstraint);
+    
+                // keep the mouse in sync with rendering
+                render.mouse = mouse;
+    
+                // fit the render viewport to the scene
+                Render.lookAt(render, {
+                    min: { x: 0, y: 0 },
+                    max: { x: 800, y: 600 }
+                });
+    
+                // context for MatterTools.Demo
+                return {
+                    engine: engine,
+                    runner: runner,
+                    render: render,
+                    canvas: render.canvas,
+                    stop: function () {
+                        Matter.Render.stop(render);
+                        Matter.Runner.stop(runner);
+                    }
+                };
             };
-        };
-
-        Example.friction.title = 'Friction';
-        Example.friction.for = '>=0.14.2';
-
-        if (typeof module !== 'undefined') {
-            module.exports = Example.friction;
+    
+            Example.friction.title = 'Friction';
+            Example.friction.for = '>=0.14.2';
+    
+            if (typeof module !== 'undefined') {
+                module.exports = Example.friction;
+            }
+            Example.friction();
         }
-        Example.friction();
+        
+
 
     </script>
 
