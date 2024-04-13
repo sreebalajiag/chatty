@@ -27,17 +27,23 @@
             let playerHeight = 40;
             let playerWidth = 80;
             Example.playAudio = function(audioText){
-                if(!this.audioPlaying || audioText=='out'){
-                    this.audioText = audioText;
-                    var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
-                    audio.play();
-                    this.audioPlaying = true;
-                    audio.addEventListener('ended',()=>{
-                        this.audioPlaying = false;
-                        if(this.audioText ==='out'){
-                            window.location.href = "/index.html";
-                        }
-                    })
+                try{
+                    if(!this.audioPlaying || audioText=='out'){
+                        this.audioText = audioText;
+                        var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
+                        audio.play();
+                        this.audioPlaying = true;
+                        audio.addEventListener('ended',()=>{
+                            this.audioPlaying = false;
+                            if(this.audioText ==='out'){
+                                window.location.href = "/index.html";
+                            }
+                        })
+                    }
+                }catch(e){
+                    if(this.audioText ==='out'){
+                                window.location.href = "/index.html";
+                            }
                 }
             }
             Example.friction = function () {
@@ -52,10 +58,6 @@
                     Bodies = Matter.Bodies;
                 Composites = Matter.Composites,
                     Common = Matter.Common;
-    
-    
-    
-    
                 // create engine
                 var engine = Engine.create(),
     
@@ -166,6 +168,7 @@
                         let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
                         if (result != null && !alreadyOut) {
                             alreadyOut = true;
+                            player.rotationSpeed = 0;
                             this.playAudio('out');
                             
                         }
