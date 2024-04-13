@@ -1,7 +1,7 @@
 window.customElements.define('virtual-joystick', class VirtualJoystick extends HTMLElement {
     static #style = `
         :host {
-            --radius: 35px;
+            --radius: 25px;
             --size: calc(var(--radius) * 2);
         }
         :host,
