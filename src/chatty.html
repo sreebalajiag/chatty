@@ -170,11 +170,10 @@
                             alreadyOut = true;
                             player.rotationSpeed = 0;
                             this.playAudio('out');
-                            
+                            setTimeout(()=>{
+                                window.location.href = "/index.html";
+                            },1000)
                         }
-                        setTimeout(()=>{
-                            window.location.href = "/index.html";
-                        },1000)
                     })
                     if (userInputing) {
                         let position = player.position;
