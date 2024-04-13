@@ -8,10 +8,10 @@
     <script src="./nipplejs.min.js"></script>
 </head>
 
-<body onload="playGame()">
+<body onload="playGame()" style="overflow: hidden;">
     <div class="score-card">0</div>
-    <div style="display: flex; gap: 10px; position:fixed;bottom: 50px;
-  right: 50px;">
+    <div style="display: flex; gap: 10px; position:fixed;bottom: 70px;
+  right: 70px;">
         <canvas id="myCanvas" style="width: 100vw;
         height: 100vh;
         position: fixed !important;
@@ -26,19 +26,19 @@
         function playGame() {
             let joyStick = { dataset: { x: 0, y: 0 } };
             let defaultX;
-                let defaultY;
+            let defaultY;
             var nipple = nipplejs.create({
                 zone: document.getElementById('joyStick'),
                 mode: 'static',
                 position: { right: '5%', bottom: '5%' },
-                color: 'red'
+                color: 'red',
+                size: 50
             });
             console.log(nipple);
             nipple.on('move', (event, data) => {
                 joyStick.dataset.x = data.position.x;
                 joyStick.dataset.y = data.position.y;
                 joyStick.dataset.force = data.force;
-                // Handle joystick movement data (data.direction, data.pressure)
             });
             var Example = Example || {};
             let playerHeight = 40;
@@ -108,18 +108,18 @@
                     id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' }
                 })
                 // add bodies
-                
-               
+
+
                 let userInputing = false;
-                
+
                 nipple.on('start',
                     (event, data) => {
                         defaultX = data.position.x;
                         defaultY = data.position.y;
                         userInputing = true;
-                // Handle joystick movement data (data.direction, data.pressure)
-                });
-                nipple.on('end',()=>{
+                        // Handle joystick movement data (data.direction, data.pressure)
+                    });
+                nipple.on('end', () => {
                     userInputing = false;
                 })
                 let gameWon = false;
@@ -231,17 +231,6 @@
                         });
                     }
                 });
-                var output = function (event) {
-                    // defaultX = parseInt(joyStick.dataset.x);
-                    // defaultY = parseInt(joyStick.dataset.y);
-
-                }
-
-                // document.getElementById("joyStick").addEventListener('joystickdown', handleJoyStickDown);
-                // document.getElementById("joyStick").addEventListener('joystickmove', output);
-                // document.getElementById("joyStick").addEventListener('joystickup', function () {
-                //     userInputing = false;
-                // });
 
 
 
@@ -250,52 +239,8 @@
                     player
                 ]);
 
-                // let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
-                // Composite.add(world, [
-                //     goalObject
-                // ]);
-
-                // setTimeout(function(){
-
-                //     Matter.Body.set(goalObject, "position", {
-                //                 x: window.innerWidth / 2,
-                //                 y: 250
-                //             });
-                // },1000)
-
-                // Composite.add(world, [
-                //     Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
-                // ]);
 
 
-
-                // let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
-                //     return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
-                // });
-
-                // Composite.add(world, stack);
-
-                // add mouse control
-
-
-
-                // var mouse = Mouse.create(render.canvas),
-                //     mouseConstraint = MouseConstraint.create(engine, {
-                //         mouse: mouse,
-                //         constraint: {
-                //             stiffness: 0.2,
-                //             render: {
-                //                 visible: false
-                //             }
-                //         }
-                //     });
-
-                // Composite.add(world, mouseConstraint);
-
-                // // keep the mouse in sync with rendering
-                // render.mouse = mouse;
-
-                // fit the render viewport to the scene
                 Render.lookAt(render, {
                     min: { x: 0, y: 0 },
                     max: { x: 800, y: 600 }
