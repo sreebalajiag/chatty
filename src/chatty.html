@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="./nipplejs.min.js"></script>
 </head>
 
 <body onload="playGame()">
@@ -18,51 +19,67 @@
         left: 0;
         z-index: -1 !important;"></canvas>
         <div id="world"></div>
-        <virtual-joystick id="joyStick" data-x="0" data-y="0"></virtual-joystick>
+        <div id="joyStick" data-x="0" data-y="0"></div>
     </div>
-    <script src="virtual-joystick.js"></script>
+
     <script>
-        function playGame(){
+        function playGame() {
+            let joyStick = { dataset: { x: 0, y: 0 } };
+            let defaultX;
+                let defaultY;
+            var nipple = nipplejs.create({
+                zone: document.getElementById('joyStick'),
+                mode: 'static',
+                position: { right: '5%', bottom: '5%' },
+                color: 'red'
+            });
+            console.log(nipple);
+            nipple.on('move', (event, data) => {
+                joyStick.dataset.x = data.position.x;
+                joyStick.dataset.y = data.position.y;
+                joyStick.dataset.force = data.force;
+                // Handle joystick movement data (data.direction, data.pressure)
+            });
             var Example = Example || {};
             let playerHeight = 40;
             let playerWidth = 80;
-            Example.playAudio = function(audioText){
-                try{
-                    if(!this.audioPlaying || audioText=='out'){
+            Example.playAudio = function (audioText) {
+                try {
+                    if (!this.audioPlaying || audioText == 'out') {
                         this.audioText = audioText;
-                        var audio = new Audio(`/assets/audio/${audioText+(Math.floor( Math.random()*3)+1)}.mp3`);
+                        var audio = new Audio(`/assets/audio/${audioText + (Math.floor(Math.random() * 3) + 1)}.mp3`);
                         audio.play();
                         this.audioPlaying = true;
-                        audio.addEventListener('ended',()=>{
+                        audio.addEventListener('ended', () => {
                             this.audioPlaying = false;
-                            if(this.audioText ==='out'){
+                            if (this.audioText === 'out') {
                                 window.location.href = "/index.html";
                             }
                         })
                     }
-                }catch(e){
-                    if(this.audioText ==='out'){
-                                window.location.href = "/index.html";
-                            }
+                } catch (e) {
+                    if (this.audioText === 'out') {
+                        window.location.href = "/index.html";
+                    }
                 }
             }
             Example.friction = function () {
-    
+
                 var Engine = Matter.Engine,
                     Events = Matter.Events,
                     Render = Matter.Render,
                     Runner = Matter.Runner,
-                    
+
                     Composite = Matter.Composite,
                     Bodies = Matter.Bodies;
                 Composites = Matter.Composites,
                     Common = Matter.Common;
                 // create engine
                 var engine = Engine.create(),
-    
+
                     world = engine.world;
                 engine.gravity.y = 0.2;
-    
+
                 // create renderer
                 var render = Render.create({
                     element: document.body,
@@ -77,36 +94,42 @@
                 });
                 Matter.Render.setPixelRatio(render, 'auto');
                 Render.run(render);
-    
+
                 // create runner
                 var runner = Runner.create();
                 Runner.run(runner, engine);
-    
-    
+
+
                 let player = Bodies.rectangle(window.innerWidth / 2 + 50, window.innerHeight - 100, playerWidth, playerHeight, {
                     inertia: Infinity,// setting inertia to infinty will prevent rotation upon collision
-        rotationSpeed: 0.5,chamfer: {
-                            radius: 10
-                        },
-                    id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' } })
+                    rotationSpeed: 0.5, chamfer: {
+                        radius: 10
+                    },
+                    id: "player", isStatic: true, friction: 10.00001, restitution: 0.5, density: 0.001, render: { fillStyle: '#E91E63' }
+                })
                 // add bodies
-                let joyStick = document.getElementById("joyStick");
-                let defaultX = joyStick.dataset.x;
-                let defaultY = joyStick.dataset.y;
+                
+               
                 let userInputing = false;
-                var handleJoyStickDown = function (event) {
-                    defaultX = parseInt(joyStick.dataset.x);
-                    defaultY = parseInt(joyStick.dataset.y);
-                    userInputing = true;
-                }
+                
+                nipple.on('start',
+                    (event, data) => {
+                        defaultX = data.position.x;
+                        defaultY = data.position.y;
+                        userInputing = true;
+                // Handle joystick movement data (data.direction, data.pressure)
+                });
+                nipple.on('end',()=>{
+                    userInputing = false;
+                })
                 let gameWon = false;
                 let alreadyOut = false;
-    
-    
+
+
                 let shapesList = [];
                 for (i = 0; i < 10; i++) {
                     var sides = Math.round(Common.random(1, 8));
-    
+
                     // round the edges of some bodies
                     var chamfer = null;
                     if (sides > 2) {
@@ -138,15 +161,15 @@
                         scoreCard.innerHTML = score;
                     }, 100)
                 setInterval(
-                     ()=> {
-    
+                    () => {
+
                         let position = player.position.x;
                         if (Common.random() > 0.75) {
                             position = Common.random(0, window.innerWidth + 100)
-                        }else{
-                            if(position<(window.innerWidth)){
+                        } else {
+                            if (position < (window.innerWidth)) {
                                 this.playAudio('right');
-                            }else{
+                            } else {
                                 this.playAudio('left');
                             }
                         }
@@ -155,30 +178,30 @@
                             x: position,
                             y: -100
                         });
-    
-    
+
+
                     }, 1500
                 )
-    
-                Events.on(engine, "beforeUpdate",  ()=> {
+
+                Events.on(engine, "beforeUpdate", () => {
                     Matter.Body.setAngle(player, player.angle + player.rotationSpeed);
                     shapesList.forEach((currentShape) => {
-    
+
                         let result = Matter.Collision.collides(currentShape, player) // returns either true or false depending on if the two objects are colliding 
                         if (result != null && !alreadyOut) {
                             alreadyOut = true;
                             player.rotationSpeed = 0;
                             this.playAudio('out');
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 window.location.href = "/index.html";
-                            },1000)
+                            }, 1000)
                         }
                     })
                     if (userInputing) {
                         let position = player.position;
                         let defferenceX = defaultX - parseInt(joyStick.dataset.x);
                         let defferenceY = defaultY - parseInt(joyStick.dataset.y);
-    
+
                         let newPositionX = (defaultX - parseInt(joyStick.dataset.x));
                         let newPositionY = (defaultY - parseInt(joyStick.dataset.y));
                         if (newPositionX < 0) {
@@ -191,17 +214,17 @@
                         } else if (newPositionY > 0) {
                             newPositionY = -1;
                         }
-    
+
                         newPositionX = joyStick.dataset.force * newPositionX * 5;
                         newPositionY = joyStick.dataset.force * newPositionY * 5;
                         newPositionX = position.x + newPositionX;
                         newPositionY = position.y + newPositionY;
-    
+
                         newPositionX = Math.min(newPositionX, window.innerWidth * 2);
                         newPositionX = Math.max(0, newPositionX);
                         newPositionY = Math.min(newPositionY, window.innerHeight);
                         newPositionY = Math.max(0, newPositionY);
-    
+
                         Matter.Body.set(player, "position", {
                             x: newPositionX,
                             y: newPositionY
@@ -211,51 +234,51 @@
                 var output = function (event) {
                     // defaultX = parseInt(joyStick.dataset.x);
                     // defaultY = parseInt(joyStick.dataset.y);
-    
+
                 }
-    
-                document.getElementById("joyStick").addEventListener('joystickdown', handleJoyStickDown);
-                document.getElementById("joyStick").addEventListener('joystickmove', output);
-                document.getElementById("joyStick").addEventListener('joystickup', function () {
-                    userInputing = false;
-                })
-    
-    
-    
-    
+
+                // document.getElementById("joyStick").addEventListener('joystickdown', handleJoyStickDown);
+                // document.getElementById("joyStick").addEventListener('joystickmove', output);
+                // document.getElementById("joyStick").addEventListener('joystickup', function () {
+                //     userInputing = false;
+                // });
+
+
+
+
                 Composite.add(world, [
                     player
                 ]);
-    
+
                 // let goalObject = Bodies.rectangle(window.innerWidth / 2, 250, 40, 40, { id: "goalObject", friction: 10.001, render: { "fillStyle": "#FF0000" } })
                 // Composite.add(world, [
                 //     goalObject
                 // ]);
-    
+
                 // setTimeout(function(){
-    
+
                 //     Matter.Body.set(goalObject, "position", {
                 //                 x: window.innerWidth / 2,
                 //                 y: 250
                 //             });
                 // },1000)
-    
+
                 // Composite.add(world, [
                 //     Bodies.rectangle(window.innerWidth / 2, 430, 40, 40, { id: "goals", friction: 10.001 })
                 // ]);
-    
-    
-    
+
+
+
                 // let stack = Composites.stack(20, 20, 20, 5, 0, 0, function (x, y) {
                 //     return Bodies.circle(x, y, Common.random(10, 20), { friction: 10.00001, restitution: 0.5, density: 0.001 });
                 // });
-    
+
                 // Composite.add(world, stack);
-    
+
                 // add mouse control
-    
-    
-    
+
+
+
                 // var mouse = Mouse.create(render.canvas),
                 //     mouseConstraint = MouseConstraint.create(engine, {
                 //         mouse: mouse,
@@ -266,18 +289,18 @@
                 //             }
                 //         }
                 //     });
-    
+
                 // Composite.add(world, mouseConstraint);
-    
+
                 // // keep the mouse in sync with rendering
                 // render.mouse = mouse;
-    
+
                 // fit the render viewport to the scene
                 Render.lookAt(render, {
                     min: { x: 0, y: 0 },
                     max: { x: 800, y: 600 }
                 });
-    
+
                 // context for MatterTools.Demo
                 return {
                     engine: engine,
@@ -290,22 +313,22 @@
                     }
                 };
             };
-    
+
             Example.friction.title = 'Friction';
             Example.friction.for = '>=0.14.2';
-    
+
             if (typeof module !== 'undefined') {
                 module.exports = Example.friction;
             }
             Example.friction();
         }
-        
+
 
 
     </script>
     <script>
-       
-       const canvas = document.getElementById('myCanvas');
+
+        const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
         // Canvas dimensions (adjusted for potential device orientation changes)
@@ -328,11 +351,11 @@
 
             // Draw left wave
             ctx.beginPath();
-            ctx.lineWidth= 20;
+            ctx.lineWidth = 20;
             ctx.strokeStyle = lightBlue; // Use strokeStyle for vertical lines
             for (let y = 0; y < height; y++) {
                 let x = amplitude * Math.sin(frequencyA * y * Math.PI / height + phaseShift);
-                x = x-100;
+                x = x - 100;
                 if (y === 0) {
                     ctx.moveTo(width / 2 + x, y);
                 } else {
@@ -346,7 +369,7 @@
             ctx.strokeStyle = lightBlue;
             for (let y = 0; y < height; y++) {
                 let x = amplitude * Math.sin(frequencyB * (y - height / 2) * Math.PI / height + phaseShift);
-                x = x+100;
+                x = x + 100;
                 if (y === 0) {
                     ctx.moveTo(width / 2 + x, y);
                 } else {
@@ -362,13 +385,13 @@
             requestAnimationFrame(drawWaves);
         }
         drawWaves();
-    
-       </script>
 
-<style>
-    canvas{
-     position: fixed; 
-     z-index: 1; 
-    }
+    </script>
+
+    <style>
+        canvas {
+
+            z-index: 1;
+        }
     </style>
 </body>
