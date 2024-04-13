@@ -23,7 +23,6 @@
     <script src="virtual-joystick.js"></script>
     <script>
         function playGame(){
-
             var Example = Example || {};
             let playerHeight = 40;
             let playerWidth = 80;
@@ -309,7 +308,8 @@
         const deviceHeight = window.innerHeight;
         canvas.width = deviceWidth;
         canvas.height = deviceHeight;
-
+        canvas.style.width = deviceHeight;
+        canvas.style.height = deviceHeight;
         function getRandomColor() {
             // Generate random bright colors (hue between 0 and 60, high saturation and brightness)
             const hue = Math.floor(Math.random() * 60);
